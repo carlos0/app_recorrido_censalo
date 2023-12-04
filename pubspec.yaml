@@ -1,0 +1,40 @@
+name: app_recorrido_mapa
+description: A new Flutter project.
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.1.5 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  get: ^4.6.5
+  qr_code_scanner: ^1.0.1
+  flutter_map: ^5.0.0
+  geolocator: ^9.0.2
+  latlong2: ^0.9.0
+  get_storage: ^2.1.1
+  quickalert: ^1.0.2
+  permission_handler: ^11.0.1
+  dio: ^5.3.4
+  zoom_widget: ^2.0.1
+  flutter_expandable_fab: ^2.0.0
+  
+  
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+    android: "launcher_icon"
+    ios: true
+    image_path: "assets/images/icon_app.png"
+
+flutter:
+  uses-material-design: true
+
+  assets: 
+    - assets/images/
