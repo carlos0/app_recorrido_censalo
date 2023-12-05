@@ -20,6 +20,7 @@ class _MapScreenState extends State<MapScreen> {
   double currentZoom = 18.49;
   LatLng? myPosition;
   String posicion = "";
+  MapsController mapController = Get.find<MapsController>();
   final MapController _controller = MapController();
   final mapController0 = MapController();
   final List<Marker> myMarkers = [];
@@ -70,18 +71,21 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    MapsController mapController = Get.find<MapsController>();
+    //MapsController mapController = Get.find<MapsController>();
     final arg = ModalRoute.of(context)!.settings.arguments != null
         ? ModalRoute.of(context)!.settings.arguments as String
         : null;
-    print(arg);
     mapController.startService();
     mapController.getPolygons(arg!);
-    return Scaffold(
-      appBar: _appBar(),
-      body: body(),
-      floatingActionButton: buildFloatingActionButton(),
-      floatingActionButtonLocation: ExpandableFab.location,
+
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        appBar: _appBar(),
+        body: body(),
+        floatingActionButton: buildFloatingActionButton(),
+        floatingActionButtonLocation: ExpandableFab.location,
+      ),
     );
   }
 
@@ -90,12 +94,84 @@ class _MapScreenState extends State<MapScreen> {
       child: Column(
         children: [
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.1,
-            child: Center(
-                child: Text(
-              "asdadsad",
-            )),
-          ),
+              height: MediaQuery.of(context).size.height * 0.1,
+              child: Container(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 5.0),
+                  child: Column(children: [
+                    Row(children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            width: 1,
+                          ),
+                        ),
+                        child: Image.asset(
+                          'assets/images/yellow_line.png',
+                          height: 10,
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 30,
+                      ),
+                      const Text('Área de trabajo'),
+                      const SizedBox(
+                        width: 40,
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            width: 1,
+                          ),
+                        ),
+                        child: Image.asset(
+                          'assets/images/red_line.jpg',
+                          height: 10,
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 30,
+                      ),
+                      const Text('Manzanas'),
+                    ]),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Row(children: [
+                      Image.asset(
+                        'assets/images/verde.png',
+                        height: 25,
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      const Text('Predio Inicial'),
+                      const SizedBox(
+                        width: 15,
+                      ),
+                      Image.asset(
+                        'assets/images/rojo.png',
+                        height: 25,
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      const Text('Predio Final'),
+                      /* const SizedBox(
+                        width: 15,
+                      ),
+                      Image.asset(
+                        'assets/images/amarillo.png',
+                        height: 25,
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      const Text('Predio inter.'), */
+                    ])
+                  ]),
+                ),
+              )),
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.80,
             child: Stack(
@@ -105,7 +181,7 @@ class _MapScreenState extends State<MapScreen> {
                   mapController: mapController0,
                   options: MapOptions(
                     //center: myPosition,
-                    center: LatLng(-17.860476861, -66.258320468),
+                    center: LatLng(-16.493712, -68.122341),
                     zoom: currentZoom,
                     minZoom: 10,
                     maxZoom: 18.49,
@@ -129,18 +205,20 @@ class _MapScreenState extends State<MapScreen> {
                         id: 'polygons',
                         builder: (_) {
                           if (_.area.isNotEmpty) {
-                            var pll = const PolygonLayer(
+                            var pll = PolygonLayer(
                               polygons: [],
                             );
                             for (var i = 0; i < _.area.length; i++) {
                               var pl = Polygon(
                                 points: [],
                                 isFilled: false,
-                                borderColor: Colors.yellow,
-                                borderStrokeWidth: 3,
+                                borderColor: Colors.redAccent,
+                                borderStrokeWidth: 5,
                                 color: const Color.fromARGB(10, 0, 255, 0),
                               );
-                              for (var j = 0; j < _.area[i].latLng.length; j++) {
+                              for (var j = 0;
+                                  j < _.area[i].latLng.length;
+                                  j++) {
                                 pl.points.add(_.area[i].latLng[j]);
                               }
                               pll.polygons.add(pl);
@@ -179,14 +257,14 @@ class _MapScreenState extends State<MapScreen> {
                               }
                             }
                             pll.polylines.add(pl);
-      
+
                             return pll;
                           }
                           return CircleLayer(
                             circles: [
                               CircleMarker(
-                                point:
-                                    LatLng(51.50739215592943, -0.127709825533512),
+                                point: LatLng(
+                                    51.50739215592943, -0.127709825533512),
                                 radius: 1,
                                 useRadiusInMeter: true,
                               ),
@@ -205,9 +283,13 @@ class _MapScreenState extends State<MapScreen> {
                               var pl = CircleMarker(
                                 point: _.points[i],
                                 useRadiusInMeter: true,
-                                color: (i + 1) != _.points.length
-                                    ? Colors.red
-                                    : Colors.green,
+                                color: _.ordenManzInt[i] == 1
+                                    ? Colors.green
+                                    : i + 1 == _.ordenManzInt.length ||
+                                            (i + 1 != _.ordenManzInt.length &&
+                                                _.ordenManzInt[i + 1] == 1)
+                                        ? Colors.red
+                                        : Colors.orange,
                                 radius: 4.5,
                                 borderStrokeWidth: 1,
                               );
@@ -221,8 +303,8 @@ class _MapScreenState extends State<MapScreen> {
                           return CircleLayer(
                             circles: [
                               CircleMarker(
-                                point:
-                                    LatLng(51.50739215592943, -0.127709825533512),
+                                point: const LatLng(
+                                    51.50739215592943, -0.127709825533512),
                                 radius: 10,
                                 useRadiusInMeter: true,
                               ),
@@ -233,9 +315,9 @@ class _MapScreenState extends State<MapScreen> {
                         init: MapsController(),
                         id: 'polygons',
                         builder: (_) {
-                          if (_.points.isNotEmpty) {
+                          if (_.ordenManzInt.isNotEmpty) {
                             var markers = MarkerLayer(markers: []);
-                            for (var i = 0; i < _.points.length; i++) {
+                            for (var i = 0; i < _.ordenManzInt.length; i++) {
                               var m = Marker(
                                 point: _.points[i],
                                 width: 18,
@@ -244,7 +326,7 @@ class _MapScreenState extends State<MapScreen> {
                                 builder: (context) => InkWell(
                                   child: Center(
                                       child: Text(
-                                    '${_.points.length - i}',
+                                    '${_.ordenManzInt[i]}',
                                     style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 10,
@@ -263,8 +345,8 @@ class _MapScreenState extends State<MapScreen> {
                           return CircleLayer(
                             circles: [
                               CircleMarker(
-                                point:
-                                    LatLng(51.50739215592943, -0.127709825533512),
+                                point: const LatLng(
+                                    51.50739215592943, -0.127709825533512),
                                 radius: 10,
                                 useRadiusInMeter: true,
                               ),
@@ -304,12 +386,13 @@ class _MapScreenState extends State<MapScreen> {
                                   point: _.area[i].latLng[0],
                                   width: 50,
                                   height: 15,
-                                  anchorPos: AnchorPos.exactly(Anchor(22, 5)),
+                                  anchorPos: AnchorPos.exactly(Anchor(20, 20)),
                                   builder: (context) {
                                     return Container(
                                       decoration: BoxDecoration(
                                           color: Colors.black87,
-                                          borderRadius: BorderRadius.circular(5)),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
                                       child: Center(
                                           child: Text(
                                         '${_.ordenManz[i]}',
@@ -325,9 +408,43 @@ class _MapScreenState extends State<MapScreen> {
                           }
                           return Text('');
                         }),
-      
+                    GetBuilder<MapsController>(
+                        init: MapsController(),
+                        id: 'position',
+                        builder: (_) {
+                          if (_.getPosition?.getPosition != null) {
+                            if (_.getPosition?.getTypePosition ==
+                                TypePosition.gps) {
+                              Future.delayed(Duration.zero, () {
+                                mapController0.move(
+                                    LatLng(_.getPosition!.getPosition.latitude,
+                                        _.getPosition!.getPosition.longitude),
+                                    mapController0.zoom < 15
+                                        ? 15
+                                        : mapController0.zoom);
+                              });
+                            }
+                            return MarkerLayer(
+                              markers: [
+                                Marker(
+                                    point: LatLng(
+                                        _.getPosition!.getPosition.latitude,
+                                        _.getPosition!.getPosition.longitude),
+                                    builder: (context) {
+                                      return const Icon(
+                                        Icons.location_on,
+                                        size: 60,
+                                        color: Colors.red,
+                                      );
+                                    })
+                              ],
+                            );
+                          }
+                          return const Text('');
+                        }),
                     GetBuilder<MapsController>(
                       init: MapsController(),
+                      autoRemove: true,
                       id: 'imageMarker',
                       builder: (_) {
                         if (_.imageMarkerPosition != null) {
@@ -339,9 +456,11 @@ class _MapScreenState extends State<MapScreen> {
                                 height: 50,
                                 anchorPos: AnchorPos.exactly(Anchor(22, 5)),
                                 builder: (context) {
+                                  var punto =
+                                      _.points.indexOf(_.imageMarkerPosition!);
                                   return Tooltip(
-                                      message:
-                                          'Predio ${(_.points.indexOf(_.imageMarkerPosition!) - _.points.length).toString().split('-')[1]}',
+                                      message: 'HOLA',
+                                          //'Predio ${_.ordenManzInt[punto]}',
                                       child: Image.asset(
                                           'assets/images/marker.png'));
                                 },
@@ -355,7 +474,9 @@ class _MapScreenState extends State<MapScreen> {
                   ],
                 ),
                 Column(children: [
-                  const SizedBox(height: 20,),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   CircleAvatar(
                     backgroundColor: Colors.redAccent, //<-- SEE HERE
                     child: IconButton(
@@ -364,12 +485,14 @@ class _MapScreenState extends State<MapScreen> {
                         color: Colors.white,
                       ),
                       onPressed: () {
-                        currentZoom ++;
+                        currentZoom++;
                         mapController0.move(mapController0.center, currentZoom);
                       },
                     ),
                   ),
-                  const SizedBox(height: 10,),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   CircleAvatar(
                     backgroundColor: Colors.redAccent, //<-- SEE HERE
                     child: IconButton(
@@ -378,8 +501,23 @@ class _MapScreenState extends State<MapScreen> {
                         color: Colors.white,
                       ),
                       onPressed: () {
-                        currentZoom --;
+                        currentZoom--;
                         mapController0.move(mapController0.center, currentZoom);
+                      },
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  CircleAvatar(
+                    backgroundColor: Colors.redAccent, //<-- SEE HERE
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.gps_fixed,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        mapController.getLocation();
                       },
                     ),
                   ),
@@ -390,6 +528,12 @@ class _MapScreenState extends State<MapScreen> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
   }
 
   AppBar _appBar() {

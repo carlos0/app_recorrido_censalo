@@ -3,43 +3,133 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class HomeScreen extends StatefulWidget {
-const HomeScreen({ Key? key }) : super(key: key);
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
+  final _searchController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
   }
-  
+
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade300,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: const Color(0xffB7241E),
         title: const Text('Recorrido censal'),
         centerTitle: true,
       ),
-      body: Container(),
-      floatingActionButton: buildFloatingActionButton(),
-    );
-  }
-
-  FloatingActionButton buildFloatingActionButton() {
-    return FloatingActionButton(
-      backgroundColor: const Color(0xffB7241E),
-      onPressed: (){
-        Get.to(() => const QrScreen())?.then((value) {
-          print('=================');
-          print(value);
-          print('=================');
-        });
-      },
-      child: const Icon(Icons.search,),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 5.0),
+          child: Column(children: [
+            Image.asset(
+              'assets/images/fondo.png',
+              opacity: const AlwaysStoppedAnimation(0.7),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            ElevatedButton(
+                onPressed: () {
+                  Get.to(() => const QrScreen());
+                },
+                style: ElevatedButton.styleFrom(
+                  textStyle:
+                      const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  minimumSize: const Size(270, 60),
+                  maximumSize: const Size(270, 60),
+                  backgroundColor: const Color(0xff194884),
+                  foregroundColor: Colors.white,
+                  shadowColor: Colors.grey,
+                  elevation: 5,
+                  side: BorderSide(
+                      color: Colors.blue.shade900,
+                      width: 2,
+                      style: BorderStyle.solid),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  tapTargetSize: MaterialTapTargetSize.padded,
+                ),
+                child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Escanear el Mapa'),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Icon(
+                        Icons.qr_code_scanner,
+                        size: 40,
+                      )
+                    ])),
+            const SizedBox(
+              height: 15,
+            ),
+            const Row(children: [
+              Expanded(child: Divider(color: Colors.black87,)),
+              Text("  Ó  ", style: TextStyle(color: Colors.grey),),
+              Expanded(child: Divider(color: Colors.black87,)),
+            ]),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(50, 15, 50, 15),
+              child: TextField(
+                controller: _searchController,
+                keyboardType: TextInputType.number,
+                maxLength: 8,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.grey[200],
+                  border: OutlineInputBorder( borderRadius: BorderRadius.circular(15),),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: const BorderSide(width: 1, color: Color(0xff010000)),
+                  ),
+                  hintText: '  Buscar segmento',
+                  labelText: '   Buscar segmento',
+                  contentPadding: const EdgeInsets.all(20.0)
+                ),
+                  
+              ),
+            ),
+            ElevatedButton(
+              onPressed: (){
+                print(_searchController.text);
+                Navigator.pushNamed(context, 'map', arguments: _searchController.text);
+              }, 
+              style: ElevatedButton.styleFrom(
+                textStyle:
+                      const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  minimumSize: const Size(270, 50),
+                  maximumSize: const Size(270, 50),
+                  backgroundColor: const Color(0xffB7241E),
+                  foregroundColor: Colors.white,
+                  shadowColor: Colors.grey,
+                  elevation: 5,
+                  side: BorderSide(
+                      color: Colors.red.shade900,
+                      width: 2,
+                      style: BorderStyle.solid),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  tapTargetSize: MaterialTapTargetSize.padded,
+              ),
+              child: const Text('Buscar'),
+            )
+          ]),
+        ),
+      ),
     );
   }
 }

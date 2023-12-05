@@ -17,6 +17,12 @@ class _QrScreenState extends State<QrScreen> {
   QRViewController? controller;
 
   @override
+  void reassemble() {
+    super.reassemble();
+    controller!.pauseCamera();
+  }
+  
+  @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
@@ -78,7 +84,7 @@ class _QrScreenState extends State<QrScreen> {
                 height: size.height * 0.4,
               ),
               ElevatedButton( onPressed: () {
-                Navigator.pushNamed(context, 'map', arguments: '32701125');
+                Navigator.pushNamed(context, 'map', arguments: '32700386');
               },child: const Text('Registrar'))
             ]
           ),
