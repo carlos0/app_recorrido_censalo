@@ -13,7 +13,9 @@ const MainApp({ Key? key }) : super(key: key);
     return GetMaterialApp(
       title: 'Recorrido censal',
       debugShowCheckedModeBanner: false,
-      //theme: ThemeData.light(useMaterial3: true),
+      theme: ThemeData(
+        useMaterial3: false,
+      ),
       initialRoute: '/',
       routes: {
         '/': (context) => const SplashScreen(),

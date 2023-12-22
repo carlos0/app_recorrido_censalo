@@ -8,11 +8,9 @@ class HttpClient {
   static HttpClient get instance => _instance;
   final Dio _dio = Dio();
   late Response onResponse;
-  final String host = "http://10.16.0.212:3000";
-  //"https://wc3.ine.gob.bo";
-  //"http://157.230.71.198:3000";
-  //"http://10.0.2.2:3000";
-  //"http://3.15.196.165:3000";
+  final String host = "https://wrc.ine.gob.bo";
+  //final String host = "http://10.16.0.212:3000";
+
   final box = GetStorage();
 
   init() {

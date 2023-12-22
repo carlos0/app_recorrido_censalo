@@ -4,7 +4,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA"/>
     <application
-        android:label="app_recorrido_mapa"
+        android:label="Recorrido censal"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity

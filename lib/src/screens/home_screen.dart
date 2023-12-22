@@ -1,6 +1,7 @@
 import 'package:app_recorrido_mapa/src/screens/qr_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -12,6 +13,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
 
   final _searchController = TextEditingController();
+  final box = GetStorage();
 
   @override
   void initState() {
@@ -33,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 5.0),
           child: Column(children: [
             Image.asset(
-              'assets/images/fondo.png',
+              'assets/images/logo_yocenso.png',
               opacity: const AlwaysStoppedAnimation(0.7),
             ),
             const SizedBox(
@@ -104,6 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             ElevatedButton(
               onPressed: (){
+                box.remove('segmento');
                 print(_searchController.text);
                 Navigator.pushNamed(context, 'map', arguments: _searchController.text);
               }, 

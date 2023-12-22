@@ -1,11 +1,13 @@
-import 'package:app_recorrido_mapa/src/utils/alert.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:zoom_widget/zoom_widget.dart';
+import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
+import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 
 import '../provider/map_controller.dart';
 
@@ -17,10 +19,16 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
+  late FollowOnLocationUpdate _followOnLocationUpdate;
+  late final StreamController<double?> _followCurrentLocationStreamController;
+  final box = GetStorage();
   double currentZoom = 18.49;
   LatLng? myPosition;
   String posicion = "";
+  String? damagedDatabaseDeleted;
+  
   MapsController mapController = Get.find<MapsController>();
+  
   final MapController _controller = MapController();
   final mapController0 = MapController();
   final List<Marker> myMarkers = [];
@@ -30,43 +38,26 @@ class _MapScreenState extends State<MapScreen> {
     'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
   ];
   String? tileSelect;
-
-/*   void getCurrentLocation() async {
-    try {
-      LocationPermission permission;
-      permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          Alert.error(
-              'Tiene que dar accesos de ubicación GPS para poder registrar voluntarios');
-          Navigator.pop(context, null);
-        }
-      }
-      await Geolocator.getCurrentPosition(
-              desiredAccuracy: LocationAccuracy.best)
-          .then((Position position) {
-        setState(() {
-          print(position);
-          myPosition = LatLng(position.latitude, position.longitude);
-        });
-      }).catchError((e) {
-        Alert.error(
-            'Tiene que activar su GPS para poder registrar voluntarios');
-        Navigator.pop(context, null);
-      });
-    } catch (e) {
-      print(e);
-    }
-  } */
+  String? segmento;
 
   @override
   void initState() {
     super.initState();
     setState(() {
       tileSelect = tilesOption[0];
+      segmento = box.read('segmento') ?? '';
+      print('box.read(): ${box.read('segmento')}');
+      
     });
+    _followOnLocationUpdate = FollowOnLocationUpdate.always;
+    _followCurrentLocationStreamController = StreamController<double?>();
     //getCurrentLocation();
+  }
+
+  @override
+  void dispose() {
+    _followCurrentLocationStreamController.close();
+    super.dispose();
   }
 
   @override
@@ -75,8 +66,13 @@ class _MapScreenState extends State<MapScreen> {
     final arg = ModalRoute.of(context)!.settings.arguments != null
         ? ModalRoute.of(context)!.settings.arguments as String
         : null;
-    mapController.startService();
     mapController.getPolygons(arg!);
+    if (segmento == null || segmento!.isEmpty) {
+      segmento = arg; 
+    }
+    if (box.read('segmento') == null) {
+      box.write('segmento', segmento!);
+    }
 
     return WillPopScope(
       onWillPop: () async => false,
@@ -97,8 +93,25 @@ class _MapScreenState extends State<MapScreen> {
               height: MediaQuery.of(context).size.height * 0.1,
               child: Container(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 5.0),
+                  padding: const EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
                   child: Column(children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Row(
+                        children: [
+                          const Text(
+                            'Segmento:  ',
+                          ),
+                          Text(
+                        ' $segmento',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.5),
+                      ),
+                        ]
+                      )
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
                     Row(children: [
                       Container(
                         decoration: BoxDecoration(
@@ -145,7 +158,7 @@ class _MapScreenState extends State<MapScreen> {
                       const SizedBox(
                         width: 10,
                       ),
-                      const Text('Predio Inicial'),
+                      const Text('P. Inicial'),
                       const SizedBox(
                         width: 15,
                       ),
@@ -156,8 +169,8 @@ class _MapScreenState extends State<MapScreen> {
                       const SizedBox(
                         width: 10,
                       ),
-                      const Text('Predio Final'),
-                      /* const SizedBox(
+                      const Text('P. Final'),
+                      const SizedBox(
                         width: 15,
                       ),
                       Image.asset(
@@ -167,8 +180,9 @@ class _MapScreenState extends State<MapScreen> {
                       const SizedBox(
                         width: 10,
                       ),
-                      const Text('Predio inter.'), */
-                    ])
+                      const Text('P. intermedio'),
+                    ]),
+                    
                   ]),
                 ),
               )),
@@ -187,6 +201,14 @@ class _MapScreenState extends State<MapScreen> {
                     maxZoom: 18.49,
                     rotation: 0,
                     interactiveFlags: InteractiveFlag.all,
+                    onPositionChanged: (MapPosition position, bool hasGesture) {
+                      if (hasGesture &&
+                          _followOnLocationUpdate != FollowOnLocationUpdate.never) {
+                        setState(
+                          () => _followOnLocationUpdate = FollowOnLocationUpdate.never,
+                        );
+                      }
+                    },
                   ),
                   children: [
                     GetBuilder<MapsController>(
@@ -198,12 +220,19 @@ class _MapScreenState extends State<MapScreen> {
                             subdomains: const ['a', 'b', 'c'],
                             userAgentPackageName:
                                 'dev.fleaflet.flutter_map.example',
+                            tileProvider: FMTC.instance('mapStore').getTileProvider(),
                           );
                         }),
+                        CurrentLocationLayer(
+                          followCurrentLocationStream:
+                              _followCurrentLocationStreamController.stream,
+                          followOnLocationUpdate: _followOnLocationUpdate,
+                        ),
                     GetBuilder<MapsController>(
                         init: MapsController(),
                         id: 'polygons',
                         builder: (_) {
+                          print('=====================================================================+_.area: ${_.area}');
                           if (_.area.isNotEmpty) {
                             var pll = PolygonLayer(
                               polygons: [],
@@ -353,26 +382,6 @@ class _MapScreenState extends State<MapScreen> {
                             ],
                           );
                         }), //END CIRCLE
-                    /*         GetBuilder<MapsController>(
-                        init: MapsController(),
-                        id: 'polygons',
-                        builder: (_) {
-                          if (_.points.isNotEmpty) {
-                            return MarkerLayer(
-                              markers: [
-                                Marker(
-                                    point: _.points[_.points.length - 1],
-                                    width: 40,
-                                    height: 50,
-                                    anchorPos: AnchorPos.exactly(Anchor(22, 5)),
-                                    builder: (context) {
-                                      return Image.asset('assets/images/marker.png');
-                                    }),
-                              ],
-                            );
-                          }
-                          return Text('');
-                        }), */
                     GetBuilder<MapsController>(
                         init: MapsController(),
                         id: 'polygons',
@@ -407,40 +416,6 @@ class _MapScreenState extends State<MapScreen> {
                             return markers;
                           }
                           return Text('');
-                        }),
-                    GetBuilder<MapsController>(
-                        init: MapsController(),
-                        id: 'position',
-                        builder: (_) {
-                          if (_.getPosition?.getPosition != null) {
-                            if (_.getPosition?.getTypePosition ==
-                                TypePosition.gps) {
-                              Future.delayed(Duration.zero, () {
-                                mapController0.move(
-                                    LatLng(_.getPosition!.getPosition.latitude,
-                                        _.getPosition!.getPosition.longitude),
-                                    mapController0.zoom < 15
-                                        ? 15
-                                        : mapController0.zoom);
-                              });
-                            }
-                            return MarkerLayer(
-                              markers: [
-                                Marker(
-                                    point: LatLng(
-                                        _.getPosition!.getPosition.latitude,
-                                        _.getPosition!.getPosition.longitude),
-                                    builder: (context) {
-                                      return const Icon(
-                                        Icons.location_on,
-                                        size: 60,
-                                        color: Colors.red,
-                                      );
-                                    })
-                              ],
-                            );
-                          }
-                          return const Text('');
                         }),
                     GetBuilder<MapsController>(
                       init: MapsController(),
@@ -513,11 +488,15 @@ class _MapScreenState extends State<MapScreen> {
                     backgroundColor: Colors.redAccent, //<-- SEE HERE
                     child: IconButton(
                       icon: const Icon(
-                        Icons.gps_fixed,
+                        Icons.my_location,
                         color: Colors.white,
                       ),
                       onPressed: () {
-                        mapController.getLocation();
+                         setState(
+                          () => _followOnLocationUpdate = FollowOnLocationUpdate.always,
+                        );
+                        // Follow the location marker on the map and zoom the map to level 18.
+                        _followCurrentLocationStreamController.add(18.49);
                       },
                     ),
                   ),
@@ -529,13 +508,6 @@ class _MapScreenState extends State<MapScreen> {
       ),
     );
   }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-  }
-
   AppBar _appBar() {
     return AppBar(
       centerTitle: true,

@@ -18,20 +18,22 @@ dependencies:
   quickalert: ^1.0.2
   permission_handler: ^11.0.1
   dio: ^5.3.4
-  zoom_widget: ^2.0.1
   flutter_expandable_fab: ^2.0.0
+  flutter_map_tile_caching: ^9.0.0-dev.3
+  connectivity_plus: ^5.0.2
+  flutter_map_location_marker:
 
   
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
-  flutter_launcher_icons: ^0.13.1
+  flutter_launcher_icons:
 
 flutter_launcher_icons:
     android: "launcher_icon"
     ios: true
-    image_path: "assets/images/icon_app.png"
+    image_path: "assets/images/logo_app.png"
 
 flutter:
   uses-material-design: true

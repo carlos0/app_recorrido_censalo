@@ -83,9 +83,9 @@ class _QrScreenState extends State<QrScreen> {
                 width: double.infinity,
                 height: size.height * 0.4,
               ),
-              ElevatedButton( onPressed: () {
+/*               ElevatedButton( onPressed: () {
                 Navigator.pushNamed(context, 'map', arguments: '32700386');
-              },child: const Text('Registrar'))
+              },child: const Text('Registrar')) */
             ]
           ),
         )
