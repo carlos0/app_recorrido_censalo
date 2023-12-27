@@ -7,9 +7,9 @@ import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();   
-    await FlutterMapTileCaching.initialise();
     await ConnectivityService().initialize();
-  await FMTC.instance('mapStore').manage.createAsync();
+    //await FlutterMapTileCaching.initialise();
+    //await FMTC.instance('mapStore').manage.createAsync();
   Get.put(MapsController());
   runApp(const MainApp());
   

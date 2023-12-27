@@ -46,8 +46,6 @@ class _MapScreenState extends State<MapScreen> {
     setState(() {
       tileSelect = tilesOption[0];
       segmento = box.read('segmento') ?? '';
-      print('box.read(): ${box.read('segmento')}');
-      
     });
     _followOnLocationUpdate = FollowOnLocationUpdate.always;
     _followCurrentLocationStreamController = StreamController<double?>();
@@ -62,16 +60,18 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print('*******************************  ');
+      print('box.read(): $segmento');
+      print('*******************************  ');
     //MapsController mapController = Get.find<MapsController>();
     final arg = ModalRoute.of(context)!.settings.arguments != null
         ? ModalRoute.of(context)!.settings.arguments as String
         : null;
-    mapController.getPolygons(arg!);
-    if (segmento == null || segmento!.isEmpty) {
-      segmento = arg; 
-    }
-    if (box.read('segmento') == null) {
-      box.write('segmento', segmento!);
+    if (arg!.isNotEmpty) {
+    mapController.getPolygons(arg);
+      segmento = arg;
+      print('entroi');
+      box.write('segmento', arg);
     }
 
     return WillPopScope(
@@ -90,7 +90,7 @@ class _MapScreenState extends State<MapScreen> {
       child: Column(
         children: [
           SizedBox(
-              height: MediaQuery.of(context).size.height * 0.1,
+              height: MediaQuery.of(context).size.height * 0.12,
               child: Container(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
@@ -220,7 +220,7 @@ class _MapScreenState extends State<MapScreen> {
                             subdomains: const ['a', 'b', 'c'],
                             userAgentPackageName:
                                 'dev.fleaflet.flutter_map.example',
-                            tileProvider: FMTC.instance('mapStore').getTileProvider(),
+                            //tileProvider: FMTC.instance('mapStore').getTileProvider(),
                           );
                         }),
                         CurrentLocationLayer(
@@ -232,7 +232,7 @@ class _MapScreenState extends State<MapScreen> {
                         init: MapsController(),
                         id: 'polygons',
                         builder: (_) {
-                          print('=====================================================================+_.area: ${_.area}');
+                          print('.area: ${_.area}');
                           if (_.area.isNotEmpty) {
                             var pll = PolygonLayer(
                               polygons: [],

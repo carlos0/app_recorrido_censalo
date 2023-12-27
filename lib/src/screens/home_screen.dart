@@ -106,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             ElevatedButton(
               onPressed: (){
-                box.remove('segmento');
+                //box.remove('segmento');
                 print(_searchController.text);
                 Navigator.pushNamed(context, 'map', arguments: _searchController.text);
               }, 
