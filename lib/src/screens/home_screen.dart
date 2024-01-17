@@ -83,6 +83,20 @@ class _HomeScreenState extends State<HomeScreen> {
               Text("  Ó  ", style: TextStyle(color: Colors.grey),),
               Expanded(child: Divider(color: Colors.black87,)),
             ]),
+            const SizedBox(
+              height: 15,
+            ),
+            Padding(
+                padding: EdgeInsets.only(
+                    left: MediaQuery.of(context).size.width * 0.09),
+                child: const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      '       Buscar segmento. ejemplo 32701125',
+                      style: TextStyle(
+                        fontSize: 14,
+                      ),
+                    ))),
             Padding(
               padding: const EdgeInsets.fromLTRB(50, 15, 50, 15),
               child: TextField(
@@ -97,8 +111,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(15),
                     borderSide: const BorderSide(width: 1, color: Color(0xff010000)),
                   ),
-                  hintText: '  Buscar segmento',
-                  labelText: '   Buscar segmento',
+                  hintText: ' Buscar segmento',
+                  labelText: ' Buscar segmento',
                   contentPadding: const EdgeInsets.all(20.0)
                 ),
                   
@@ -106,9 +120,9 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             ElevatedButton(
               onPressed: (){
-                //box.remove('segmento');
-                print(_searchController.text);
+                box.write('segmento', _searchController.text);
                 Navigator.pushNamed(context, 'map', arguments: _searchController.text);
+                _searchController.text = '';
               }, 
               style: ElevatedButton.styleFrom(
                 textStyle:

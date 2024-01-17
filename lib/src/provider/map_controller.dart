@@ -1,14 +1,9 @@
-import 'dart:async';
-import 'dart:convert';
 import 'package:app_recorrido_mapa/src/models/polygon.dart';
-import 'package:app_recorrido_mapa/src/provider/marker.widget.dart';
 import 'package:app_recorrido_mapa/src/services/connectivity_service.dart';
 import 'package:flutter_map/flutter_map.dart';
-//import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import 'http_client.dart';
 import 'http_response.dart';
@@ -19,12 +14,14 @@ enum TypePosition { gps, stream }
 
 class MapsController extends GetxController {
   final box = GetStorage();
-  Status _status = Status.stop;
+  final Status _status = Status.stop;
   Status get getStatus => _status;
   final List<Marker> _markers = [];
   String? _path;
   List<Marker> get markers => _markers;
   String? get getPath => _path;
+  String? _seg_unico;
+  String? get getSegUnico => _seg_unico;
 
   List<PolygonModel> _polygons = [];
   List<PolygonModel> get polygons => _polygons;
@@ -37,6 +34,8 @@ class MapsController extends GetxController {
 
   List<String> _ordenManz = [];
   List<String> get ordenManz => _ordenManz;
+  List<dynamic> _puntoManz = [];
+  List<dynamic> get puntoManz => _puntoManz;
   List<int> _ordenManzInt = [];
   List<int> get ordenManzInt => _ordenManzInt;
 
@@ -61,7 +60,10 @@ class MapsController extends GetxController {
         _points = [];
         _area = [];
         _ordenManz = [];
+        _puntoManz = [];
         _ordenManzInt = [];
+        _seg_unico = response.data['seg_unico'];
+        box.write('seg_unico', _seg_unico);
         for (var i = 0; i < points.length; i++) {
           var d = points[i]['point'];
           _points.add(LatLng(d[1], d[0]));
@@ -76,6 +78,7 @@ class MapsController extends GetxController {
         for (var i = 0; i < area.length; i++) {
           var d = area[i]['area'];
           _ordenManz.add(area[i]['orden_manz']);
+          _puntoManz.add(LatLng(area[i]['punto_medio'][1], area[i]['punto_medio'][0]));
           List<LatLng> latLng = [];
           for (var j = 0; j < d.length; j++) {
             latLng.add(LatLng(d[j][1], d[j][0]));
@@ -91,11 +94,9 @@ class MapsController extends GetxController {
       }
     } else {
       var polygons = box.read('polygons');
-      print('polygons: ${polygons}');
       var points = box.read('points');
-      print('points: ${points}');
       var area = box.read('areas');
-      print('area: ${area}');
+      if (polygons != null && points != null && area != null) {
       _polygons = [];
       _points = [];
       _area = [];
@@ -121,8 +122,41 @@ class MapsController extends GetxController {
         }
         _area.add(PolygonModel(latLng));
       }
-      
+      }
       //update(['polygons']);
+    }
+  }
+
+  getPoligonCache() {
+    var polygons = box.read('polygons');
+    var points = box.read('points');
+    var area = box.read('areas');
+    if (polygons != null && points != null && area != null) {
+      _polygons = [];
+      _points = [];
+      _area = [];
+      _ordenManz = [];
+      _ordenManzInt = [];
+      for (var i = 0; i < points.length; i++) {
+        var d = points[i]['point'];
+        _points.add(LatLng(d[1], d[0]));
+        _ordenManzInt.add(int.parse(points[i]['ord_pre_seg']));
+      }
+      for (var i = 0; i < polygons.length; i++) {
+        var d = polygons[i];
+        List<LatLng> latLng = [];
+        latLng.add(LatLng(d[1], d[0]));
+        _polygons.add(PolygonModel(latLng));
+      }
+      for (var i = 0; i < area.length; i++) {
+        var d = area[i]['area'];
+        _ordenManz.add(area[i]['orden_manz']);
+        List<LatLng> latLng = [];
+        for (var j = 0; j < d.length; j++) {
+          latLng.add(LatLng(d[j][1], d[j][0]));
+        }
+        _area.add(PolygonModel(latLng));
+      }
     }
   }
 

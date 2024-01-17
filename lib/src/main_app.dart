@@ -1,7 +1,6 @@
 import 'package:app_recorrido_mapa/src/screens/home_screen.dart';
 import 'package:app_recorrido_mapa/src/screens/map_screen.dart';
 import 'package:app_recorrido_mapa/src/screens/qr_screen.dart';
-import 'package:app_recorrido_mapa/src/screens/splash_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -16,9 +15,8 @@ const MainApp({ Key? key }) : super(key: key);
       theme: ThemeData(
         useMaterial3: false,
       ),
-      initialRoute: '/',
+      initialRoute: 'home',
       routes: {
-        '/': (context) => const SplashScreen(),
         'home': (context) => const HomeScreen(),
         'qr': (context) => const QrScreen(),
         'map': (context) => const MapScreen(),

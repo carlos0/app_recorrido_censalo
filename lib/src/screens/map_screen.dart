@@ -5,6 +5,7 @@ import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:info_popup/info_popup.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
@@ -19,6 +20,13 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
+  @override
+  void setState(VoidCallback fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
+
   late FollowOnLocationUpdate _followOnLocationUpdate;
   late final StreamController<double?> _followCurrentLocationStreamController;
   final box = GetStorage();
@@ -43,35 +51,26 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void initState() {
     super.initState();
-    setState(() {
-      tileSelect = tilesOption[0];
-      segmento = box.read('segmento') ?? '';
-    });
+    if (mounted) {
+      setState(() {
+        tileSelect = box.read('tileSelect') ?? tilesOption[0];
+        segmento = box.read('segmento') ?? '';
+      });
+    }
     _followOnLocationUpdate = FollowOnLocationUpdate.always;
     _followCurrentLocationStreamController = StreamController<double?>();
     //getCurrentLocation();
   }
 
   @override
-  void dispose() {
-    _followCurrentLocationStreamController.close();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    print('*******************************  ');
-      print('box.read(): $segmento');
-      print('*******************************  ');
-    //MapsController mapController = Get.find<MapsController>();
     final arg = ModalRoute.of(context)!.settings.arguments != null
         ? ModalRoute.of(context)!.settings.arguments as String
         : null;
     if (arg!.isNotEmpty) {
-    mapController.getPolygons(arg);
-      segmento = arg;
-      print('entroi');
-      box.write('segmento', arg);
+      mapController.getPolygons(segmento!);
+    } else {
+      mapController.getPoligonCache();
     }
 
     return WillPopScope(
@@ -91,100 +90,98 @@ class _MapScreenState extends State<MapScreen> {
         children: [
           SizedBox(
               height: MediaQuery.of(context).size.height * 0.12,
-              child: Container(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
-                  child: Column(children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Row(
-                        children: [
-                          const Text(
-                            'Segmento:  ',
-                          ),
-                          Text(
-                        ' $segmento',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.5),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
+                child: Column(children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Row(
+                      children: [
+                        const Text(
+                          'Segmento:  ',
+                        ),
+                        Text(
+                          box.read('seg_unico') ?? ' $segmento',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.5),
+                    ),
+                      ]
+                    )
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Row(children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          width: 1,
+                        ),
                       ),
-                        ]
-                      )
+                      child: Image.asset(
+                        'assets/images/yellow_line.png',
+                        height: 10,
+                      ),
                     ),
                     const SizedBox(
-                      height: 5,
+                      width: 30,
                     ),
-                    Row(children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            width: 1,
-                          ),
-                        ),
-                        child: Image.asset(
-                          'assets/images/yellow_line.png',
-                          height: 10,
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 30,
-                      ),
-                      const Text('Área de trabajo'),
-                      const SizedBox(
-                        width: 40,
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            width: 1,
-                          ),
-                        ),
-                        child: Image.asset(
-                          'assets/images/red_line.jpg',
-                          height: 10,
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 30,
-                      ),
-                      const Text('Manzanas'),
-                    ]),
+                    const Text('Área de trabajo'),
                     const SizedBox(
-                      height: 5,
+                      width: 40,
                     ),
-                    Row(children: [
-                      Image.asset(
-                        'assets/images/verde.png',
-                        height: 25,
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          width: 1,
+                        ),
                       ),
-                      const SizedBox(
-                        width: 10,
+                      child: Image.asset(
+                        'assets/images/red_line.jpg',
+                        height: 10,
                       ),
-                      const Text('P. Inicial'),
-                      const SizedBox(
-                        width: 15,
-                      ),
-                      Image.asset(
-                        'assets/images/rojo.png',
-                        height: 25,
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      const Text('P. Final'),
-                      const SizedBox(
-                        width: 15,
-                      ),
-                      Image.asset(
-                        'assets/images/amarillo.png',
-                        height: 25,
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      const Text('P. intermedio'),
-                    ]),
-                    
+                    ),
+                    const SizedBox(
+                      width: 30,
+                    ),
+                    const Text('Manzanas'),
                   ]),
-                ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Row(children: [
+                    Image.asset(
+                      'assets/images/verde.png',
+                      height: 25,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    const Text('P. Inicial'),
+                    const SizedBox(
+                      width: 15,
+                    ),
+                    Image.asset(
+                      'assets/images/rojo.png',
+                      height: 25,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    const Text('P. Final'),
+                    const SizedBox(
+                      width: 15,
+                    ),
+                    Image.asset(
+                      'assets/images/amarillo.png',
+                      height: 25,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    const Text('P. intermedio'),
+                  ]),
+                  
+                ]),
               )),
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.80,
@@ -195,7 +192,7 @@ class _MapScreenState extends State<MapScreen> {
                   mapController: mapController0,
                   options: MapOptions(
                     //center: myPosition,
-                    center: LatLng(-16.493712, -68.122341),
+                    center: const LatLng(-16.493712, -68.122341),
                     zoom: currentZoom,
                     minZoom: 10,
                     maxZoom: 18.49,
@@ -203,7 +200,7 @@ class _MapScreenState extends State<MapScreen> {
                     interactiveFlags: InteractiveFlag.all,
                     onPositionChanged: (MapPosition position, bool hasGesture) {
                       if (hasGesture &&
-                          _followOnLocationUpdate != FollowOnLocationUpdate.never) {
+                          _followOnLocationUpdate != FollowOnLocationUpdate.never && mounted) {
                         setState(
                           () => _followOnLocationUpdate = FollowOnLocationUpdate.never,
                         );
@@ -220,7 +217,7 @@ class _MapScreenState extends State<MapScreen> {
                             subdomains: const ['a', 'b', 'c'],
                             userAgentPackageName:
                                 'dev.fleaflet.flutter_map.example',
-                            //tileProvider: FMTC.instance('mapStore').getTileProvider(),
+                            tileProvider: FMTC.instance('mapStore').getTileProvider(),
                           );
                         }),
                         CurrentLocationLayer(
@@ -232,7 +229,6 @@ class _MapScreenState extends State<MapScreen> {
                         init: MapsController(),
                         id: 'polygons',
                         builder: (_) {
-                          print('.area: ${_.area}');
                           if (_.area.isNotEmpty) {
                             var pll = PolygonLayer(
                               polygons: [],
@@ -292,7 +288,7 @@ class _MapScreenState extends State<MapScreen> {
                           return CircleLayer(
                             circles: [
                               CircleMarker(
-                                point: LatLng(
+                                point: const LatLng(
                                     51.50739215592943, -0.127709825533512),
                                 radius: 1,
                                 useRadiusInMeter: true,
@@ -319,15 +315,17 @@ class _MapScreenState extends State<MapScreen> {
                                                 _.ordenManzInt[i + 1] == 1)
                                         ? Colors.red
                                         : Colors.orange,
-                                radius: 4.5,
+                                radius: 5.2,
                                 borderStrokeWidth: 1,
                               );
                               pll.circles.add(pl);
                             }
-                            Future.delayed(const Duration(seconds: 1), () {
-                              mapController0.move(_.points[0], 18);
-                            });
-                            return pll;
+                            if (mounted == true && _.points.isNotEmpty) {
+                              Future.delayed(const Duration(seconds: 1), () {
+                                mapController0.move(_.points[0], 18);
+                              });
+                             return pll;
+                            }
                           }
                           return CircleLayer(
                             circles: [
@@ -392,21 +390,23 @@ class _MapScreenState extends State<MapScreen> {
                             );
                             for (var i = 0; i < _.area.length; i++) {
                               markers.markers.add(Marker(
-                                  point: _.area[i].latLng[0],
-                                  width: 50,
+                                  point: _.puntoManz[i],
+                                  width: 65,
                                   height: 15,
                                   anchorPos: AnchorPos.exactly(Anchor(20, 20)),
                                   builder: (context) {
                                     return Container(
                                       decoration: BoxDecoration(
-                                          color: Colors.black87,
+                                          color: Colors.white,
                                           borderRadius:
                                               BorderRadius.circular(5)),
                                       child: Center(
                                           child: Text(
-                                        '${_.ordenManz[i]}',
-                                        style: TextStyle(
-                                            color: Colors.white,
+                                        _.ordenManz[i],
+                                        overflow: TextOverflow.visible,
+                                        maxLines: null,
+                                        style: const TextStyle(
+                                            color: Colors.black,
                                             fontWeight: FontWeight.bold,
                                             fontSize: 12),
                                       )),
@@ -415,7 +415,7 @@ class _MapScreenState extends State<MapScreen> {
                             }
                             return markers;
                           }
-                          return Text('');
+                          return const Text('');
                         }),
                     GetBuilder<MapsController>(
                       init: MapsController(),
@@ -433,9 +433,8 @@ class _MapScreenState extends State<MapScreen> {
                                 builder: (context) {
                                   var punto =
                                       _.points.indexOf(_.imageMarkerPosition!);
-                                  return Tooltip(
-                                      message: 'HOLA',
-                                          //'Predio ${_.ordenManzInt[punto]}',
+                                  return InfoPopupWidget(
+                                      contentTitle: 'Predio',
                                       child: Image.asset(
                                           'assets/images/marker.png'));
                                 },
@@ -492,11 +491,12 @@ class _MapScreenState extends State<MapScreen> {
                         color: Colors.white,
                       ),
                       onPressed: () {
-                         setState(
-                          () => _followOnLocationUpdate = FollowOnLocationUpdate.always,
-                        );
-                        // Follow the location marker on the map and zoom the map to level 18.
-                        _followCurrentLocationStreamController.add(18.49);
+                         if (mounted) {
+                          setState(
+                            () => _followOnLocationUpdate = FollowOnLocationUpdate.always,
+                          );
+                          _followCurrentLocationStreamController.add(18.49);
+                         }
                       },
                     ),
                   ),
@@ -517,9 +517,11 @@ class _MapScreenState extends State<MapScreen> {
             color: Colors.white,
           ),
           onPressed: () {
-            Navigator.pushNamed(context, 'home');
+            //Navigator.pushNamed(context, 'home');
+            box.remove('segmento');
+            Navigator.pop(context);
           }),
-      backgroundColor: Color(0xffB7241E),
+      backgroundColor: const Color(0xffB7241E),
       title: const Text(
         'Recorrido censal',
         style: TextStyle(color: Colors.white),
@@ -559,6 +561,7 @@ class _MapScreenState extends State<MapScreen> {
           onPressed: () {
             setState(() {
               tileSelect = tilesOption[0];
+              box.write('tileSelect', tilesOption[0]);
             });
           },
         ),
@@ -573,6 +576,7 @@ class _MapScreenState extends State<MapScreen> {
           onPressed: () {
             setState(() {
               tileSelect = tilesOption[1];
+              box.write('tileSelect', tilesOption[1]);
             });
           },
         ),
@@ -587,6 +591,7 @@ class _MapScreenState extends State<MapScreen> {
           onPressed: () {
             setState(() {
               tileSelect = tilesOption[2];
+              box.write('tileSelect', tilesOption[2]);
             });
           },
         ),

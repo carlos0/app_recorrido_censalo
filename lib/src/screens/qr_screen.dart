@@ -2,6 +2,7 @@ import 'package:app_recorrido_mapa/src/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_navigation/get_navigation.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class QrScreen extends StatefulWidget {
@@ -12,6 +13,7 @@ class QrScreen extends StatefulWidget {
 }
 
 class _QrScreenState extends State<QrScreen> {
+  final box = GetStorage();
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   Barcode? result;
   QRViewController? controller;
@@ -99,6 +101,7 @@ class _QrScreenState extends State<QrScreen> {
       setState(() {
         final result = scanData;
         controller.pauseCamera();
+        box.write('segmento', result.code);
         Navigator.pushNamed(context, 'map', arguments: result.code)
           .then((value) => {
             controller.resumeCamera(),

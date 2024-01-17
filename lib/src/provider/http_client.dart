@@ -9,7 +9,7 @@ class HttpClient {
   final Dio _dio = Dio();
   late Response onResponse;
   final String host = "https://wrc.ine.gob.bo";
-  //final String host = "http://10.16.0.212:3000";
+  //final String host = "http://10.16.0.212:3010";
 
   final box = GetStorage();
 
@@ -23,7 +23,6 @@ class HttpClient {
     box.write('user', data);
   }
   Future<HttpResponse> get(String url) async {
-    print(2);
     print('url $host/$url');
     try {
       final token = box.read('token');
