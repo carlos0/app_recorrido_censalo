@@ -46,7 +46,7 @@ class _MapScreenState extends State<MapScreen> {
     'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
   ];
   String? tileSelect;
-  String? segmento;
+  String segmento = '';
 
   @override
   void initState() {
@@ -54,7 +54,6 @@ class _MapScreenState extends State<MapScreen> {
     if (mounted) {
       setState(() {
         tileSelect = box.read('tileSelect') ?? tilesOption[0];
-        segmento = box.read('segmento') ?? '';
       });
     }
     _followOnLocationUpdate = FollowOnLocationUpdate.always;
@@ -68,7 +67,10 @@ class _MapScreenState extends State<MapScreen> {
         ? ModalRoute.of(context)!.settings.arguments as String
         : null;
     if (arg!.isNotEmpty) {
-      mapController.getPolygons(segmento!);
+      mapController.getPolygons(arg);
+      setState(() {
+        segmento = arg;
+      });
     } else {
       mapController.getPoligonCache();
     }
@@ -101,7 +103,7 @@ class _MapScreenState extends State<MapScreen> {
                           'Segmento:  ',
                         ),
                         Text(
-                          box.read('seg_unico') ?? ' $segmento',
+                         box.read('seg_unico').length > 8 ? box.read('seg_unico') : ' $segmento',
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.5),
                     ),
                       ]

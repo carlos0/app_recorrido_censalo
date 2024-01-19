@@ -143,7 +143,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   tapTargetSize: MaterialTapTargetSize.padded,
               ),
               child: const Text('Buscar'),
-            )
+            ),
+            const SizedBox(
+              height: 40,
+            ),
+            const Text('Versión 0.1.4', style: TextStyle(fontSize: 13, color: Colors.black54),),
           ]),
         ),
       ),
