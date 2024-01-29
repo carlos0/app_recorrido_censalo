@@ -30,6 +30,7 @@ class _MapScreenState extends State<MapScreen> {
   late FollowOnLocationUpdate _followOnLocationUpdate;
   late final StreamController<double?> _followCurrentLocationStreamController;
   final box = GetStorage();
+  double sizePredio = 2.0;
   double currentZoom = 18.49;
   LatLng? myPosition;
   String posicion = "";
@@ -54,6 +55,7 @@ class _MapScreenState extends State<MapScreen> {
     if (mounted) {
       setState(() {
         tileSelect = box.read('tileSelect') ?? tilesOption[0];
+        sizePredio = box.read('sizePredio') ?? 2.0;
       });
     }
     _followOnLocationUpdate = FollowOnLocationUpdate.always;
@@ -317,7 +319,7 @@ class _MapScreenState extends State<MapScreen> {
                                                 _.ordenManzInt[i + 1] == 1)
                                         ? Colors.red
                                         : Colors.orange,
-                                radius: 5.2,
+                                radius: sizePredio,
                                 borderStrokeWidth: 1,
                               );
                               pll.circles.add(pl);
@@ -461,25 +463,36 @@ class _MapScreenState extends State<MapScreen> {
                         color: Colors.white,
                       ),
                       onPressed: () {
-                        currentZoom++;
-                        mapController0.move(mapController0.center, currentZoom);
+                        setState(() {
+                          sizePredio += 0.2;
+                          box.write('sizePredio', sizePredio);
+                        });
+                        //currentZoom++;
+                        //mapController0.move(mapController0.center, currentZoom);
                       },
                     ),
                   ),
                   const SizedBox(
                     height: 10,
                   ),
-                  CircleAvatar(
-                    backgroundColor: Colors.redAccent, //<-- SEE HERE
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.remove,
-                        color: Colors.white,
+                  InfoPopupWidget(
+                    contentTitle: 'Reducir el tamaño del predio',
+                    child: CircleAvatar(
+                      backgroundColor: Colors.redAccent, //<-- SEE HERE
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.remove,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          //currentZoom--;
+                          //mapController0.move(mapController0.center, currentZoom);
+                          setState(() {
+                            sizePredio -= 0.2;
+                            box.write('sizePredio', sizePredio);
+                          });
+                        },
                       ),
-                      onPressed: () {
-                        currentZoom--;
-                        mapController0.move(mapController0.center, currentZoom);
-                      },
                     ),
                   ),
                   const SizedBox(
