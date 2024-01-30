@@ -11,7 +11,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();   
     await ConnectivityService().initialize();
           DependencyInjection.init();
-          requestNotificationPermission();
+          //requestNotificationPermission();
     await FlutterMapTileCaching.initialise();
     await FMTC.instance('mapStore').manage.createAsync();
   Get.put(MapsController());
@@ -19,7 +19,7 @@ Future<void> main() async {
   
 }
 
-Future<void> requestNotificationPermission() async {
+/* Future<void> requestNotificationPermission() async {
   var status = await Permission.notification.request();
   var status1 = await Permission.scheduleExactAlarm.request();
   if (status != PermissionStatus.granted) {
@@ -28,5 +28,5 @@ Future<void> requestNotificationPermission() async {
   if (status1 != PermissionStatus.granted) {
     // Handle the case where the user does not grant permission
   }
-}
+} */
 

@@ -35,6 +35,7 @@ class _MapScreenState extends State<MapScreen> {
   LatLng? myPosition;
   String posicion = "";
   String? damagedDatabaseDeleted;
+  bool mostrarManzano = true;
   
   MapsController mapController = Get.find<MapsController>();
   
@@ -105,7 +106,7 @@ class _MapScreenState extends State<MapScreen> {
                           'Segmento:  ',
                         ),
                         Text(
-                         box.read('seg_unico').length > 8 ? box.read('seg_unico') : ' $segmento',
+                         box.read('seg_unico').toString().length > 8 ? box.read('seg_unico') : ' $segmento',
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.5),
                     ),
                       ]
@@ -399,21 +400,24 @@ class _MapScreenState extends State<MapScreen> {
                                   height: 15,
                                   anchorPos: AnchorPos.exactly(Anchor(20, 20)),
                                   builder: (context) {
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(5)),
-                                      child: Center(
-                                          child: Text(
-                                        _.ordenManz[i],
-                                        overflow: TextOverflow.visible,
-                                        maxLines: null,
-                                        style: const TextStyle(
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 12),
-                                      )),
+                                    return Visibility(
+                                      visible: mostrarManzano,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
+                                        child: Center(
+                                            child: Text(
+                                              _.ordenManz[i],
+                                              overflow: TextOverflow.visible,
+                                              maxLines: null,
+                                              style: const TextStyle(
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12),
+                                                                                  )),
+                                      ),
                                     );
                                   }));
                             }
@@ -459,7 +463,7 @@ class _MapScreenState extends State<MapScreen> {
                     backgroundColor: Colors.redAccent, //<-- SEE HERE
                     child: IconButton(
                       icon: const Icon(
-                        Icons.add,
+                        Icons.zoom_in,
                         color: Colors.white,
                       ),
                       onPressed: () {
@@ -475,24 +479,44 @@ class _MapScreenState extends State<MapScreen> {
                   const SizedBox(
                     height: 10,
                   ),
-                  InfoPopupWidget(
-                    contentTitle: 'Reducir el tamaño del predio',
-                    child: CircleAvatar(
-                      backgroundColor: Colors.redAccent, //<-- SEE HERE
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.remove,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {
-                          //currentZoom--;
-                          //mapController0.move(mapController0.center, currentZoom);
-                          setState(() {
-                            sizePredio -= 0.2;
-                            box.write('sizePredio', sizePredio);
-                          });
-                        },
+                  CircleAvatar(
+                    backgroundColor: Colors.redAccent, //<-- SEE HERE
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.zoom_out,
+                        color: Colors.white,
                       ),
+                      onPressed: () {
+                        //currentZoom--;
+                        //mapController0.move(mapController0.center, currentZoom);
+                        setState(() {
+                          sizePredio -= 0.2;
+                          box.write('sizePredio', sizePredio);
+                        });
+                      },
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  CircleAvatar(
+                    backgroundColor: Colors.redAccent, //<-- SEE HERE
+                    child: IconButton(
+                      icon: 
+                      mostrarManzano == true ?
+                      const Icon(
+                        Icons.visibility,
+                        color: Colors.white,
+                      ):
+                      const Icon(
+                        Icons.visibility_off,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          mostrarManzano = !mostrarManzano;
+                        });
+                      },
                     ),
                   ),
                   const SizedBox(

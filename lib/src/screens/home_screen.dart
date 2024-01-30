@@ -120,9 +120,14 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             ElevatedButton(
               onPressed: (){
-                box.write('segmento', _searchController.text);
-                Navigator.pushNamed(context, 'map', arguments: _searchController.text);
-                _searchController.text = '';
+                RegExp exp = RegExp(r'^\d{6,8}$');
+                if (exp.hasMatch(_searchController.text)) {
+                  box.write('segmento', _searchController.text);
+                  Navigator.pushNamed(context, 'map', arguments: _searchController.text);
+                  _searchController.text = '';
+                } else {
+                  Get.snackbar('Error', 'El segmento no es valido', snackPosition: SnackPosition.TOP, backgroundColor: Colors.red, colorText: Colors.white);
+                }
               }, 
               style: ElevatedButton.styleFrom(
                 textStyle:
@@ -147,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(
               height: 40,
             ),
-            const Text('Versión 0.1.4', style: TextStyle(fontSize: 13, color: Colors.black54),),
+            const Text('Versión 0.1.6', style: TextStyle(fontSize: 13, color: Colors.black54),),
           ]),
         ),
       ),

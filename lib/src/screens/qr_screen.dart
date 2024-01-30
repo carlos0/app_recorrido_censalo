@@ -101,11 +101,18 @@ class _QrScreenState extends State<QrScreen> {
       setState(() {
         final result = scanData;
         controller.pauseCamera();
-        box.write('segmento', result.code);
-        Navigator.pushNamed(context, 'map', arguments: result.code)
-          .then((value) => {
-            controller.resumeCamera(),
-          });
+        RegExp exp = RegExp(r'^\d{6,8}$');
+        if (exp.hasMatch(result.code!)) {
+          box.write('segmento', result.code);
+          Navigator.pushNamed(context, 'map', arguments: result.code)
+            .then((value) => {
+              controller.resumeCamera(),
+            });
+          
+        } else {
+          Navigator.pop(context);
+          Get.snackbar('Error', 'El segmento no es valido', snackPosition: SnackPosition.TOP, backgroundColor: Colors.red, colorText: Colors.white);
+        }
       });
     });
   }
