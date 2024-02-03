@@ -305,7 +305,7 @@ class _MapScreenState extends State<MapScreen> {
                         init: MapsController(),
                         id: 'polygons',
                         builder: (_) {
-                          if (_.points.isNotEmpty) {
+                          if (_.points.isNotEmpty && _.ordenManzInt.isNotEmpty) {
                             var pll = CircleLayer(
                               circles: [],
                             );
@@ -389,7 +389,7 @@ class _MapScreenState extends State<MapScreen> {
                         init: MapsController(),
                         id: 'polygons',
                         builder: (_) {
-                          if (_.ordenManz.isNotEmpty) {
+                          if (_.area.isNotEmpty && _.ordenManz.isNotEmpty) {
                             var markers = MarkerLayer(
                               markers: [],
                             );

@@ -101,10 +101,12 @@ class _QrScreenState extends State<QrScreen> {
       setState(() {
         final result = scanData;
         controller.pauseCamera();
-        RegExp exp = RegExp(r'^\d{6,8}$');
-        if (exp.hasMatch(result.code!)) {
-          box.write('segmento', result.code);
-          Navigator.pushNamed(context, 'map', arguments: result.code)
+        var verifResult = result.code!.split('-');
+        print('verifResult[0]: ${verifResult[0]}');
+        RegExp exp = RegExp(r'^\d{8}$');
+        if (exp.hasMatch(verifResult[0])) {
+          box.write('segmento', verifResult[0]);
+          Navigator.pushNamed(context, 'map', arguments: verifResult[0])
             .then((value) => {
               controller.resumeCamera(),
             });

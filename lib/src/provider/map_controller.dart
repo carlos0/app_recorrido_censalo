@@ -101,6 +101,7 @@ class MapsController extends GetxController {
       _points = [];
       _area = [];
       _ordenManz = [];
+      _puntoManz = [];
       _ordenManzInt = [];
       for (var i = 0; i < points.length; i++) {
         var d = points[i]['point'];
@@ -116,6 +117,7 @@ class MapsController extends GetxController {
       for (var i = 0; i < area.length; i++) {
         var d = area[i]['area'];
         _ordenManz.add(area[i]['orden_manz']);
+        _puntoManz.add(LatLng(area[i]['punto_medio'][1], area[i]['punto_medio'][0]));
         List<LatLng> latLng = [];
         for (var j = 0; j < d.length; j++) {
           latLng.add(LatLng(d[j][1], d[j][0]));
@@ -136,6 +138,7 @@ class MapsController extends GetxController {
       _points = [];
       _area = [];
       _ordenManz = [];
+      _puntoManz = [];
       _ordenManzInt = [];
       for (var i = 0; i < points.length; i++) {
         var d = points[i]['point'];
@@ -151,6 +154,7 @@ class MapsController extends GetxController {
       for (var i = 0; i < area.length; i++) {
         var d = area[i]['area'];
         _ordenManz.add(area[i]['orden_manz']);
+        _puntoManz.add(LatLng(area[i]['punto_medio'][1], area[i]['punto_medio'][0]));
         List<LatLng> latLng = [];
         for (var j = 0; j < d.length; j++) {
           latLng.add(LatLng(d[j][1], d[j][0]));
