@@ -408,15 +408,39 @@ class _MapScreenState extends State<MapScreen> {
                                             borderRadius:
                                                 BorderRadius.circular(5)),
                                         child: Center(
-                                            child: Text(
-                                              _.ordenManz[i],
-                                              overflow: TextOverflow.visible,
-                                              maxLines: null,
-                                              style: const TextStyle(
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 12),
-                                                                                  )),
+                                            child: InfoPopupWidget(
+                                              contentTitle: _.mensajeManz[i],
+                                              child: RichText(
+                                                text: TextSpan(
+                                                  children: [
+                                                    TextSpan(
+                                                      text: _.ordenManz[i].split('/')[0],
+                                                      style: const TextStyle(
+                                                        color: Color.fromARGB(255, 29, 130, 207),
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 12
+                                                      )
+                                                    ),
+                                                    const TextSpan(
+                                                      text: '/',
+                                                      style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 12
+                                                      )
+                                                    ),
+                                                    TextSpan(
+                                                      text: _.ordenManz[i].split('/')[1],
+                                                      style: const TextStyle(
+                                                        color: Colors.black,
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 12
+                                                      )
+                                                    )
+                                                  ]
+                                                )
+                                              )
+                                            )),
                                       ),
                                     );
                                   }));

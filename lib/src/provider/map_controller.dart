@@ -38,7 +38,9 @@ class MapsController extends GetxController {
   List<dynamic> get puntoManz => _puntoManz;
   List<int> _ordenManzInt = [];
   List<int> get ordenManzInt => _ordenManzInt;
-
+  List<String> get mensajeManz => _mensajeManz;
+  List<String> _mensajeManz = [];
+ 
   LatLng? imageMarkerPosition;
 
   @override
@@ -62,6 +64,7 @@ class MapsController extends GetxController {
         _ordenManz = [];
         _puntoManz = [];
         _ordenManzInt = [];
+        _mensajeManz = [];
         _seg_unico = response.data['seg_unico'];
         box.write('seg_unico', _seg_unico);
         for (var i = 0; i < points.length; i++) {
@@ -79,6 +82,7 @@ class MapsController extends GetxController {
           var d = area[i]['area'];
           _ordenManz.add(area[i]['orden_manz']);
           _puntoManz.add(LatLng(area[i]['punto_medio'][1], area[i]['punto_medio'][0]));
+          _mensajeManz.add(area[i]['mensaje']);
           List<LatLng> latLng = [];
           for (var j = 0; j < d.length; j++) {
             latLng.add(LatLng(d[j][1], d[j][0]));
@@ -103,6 +107,7 @@ class MapsController extends GetxController {
       _ordenManz = [];
       _puntoManz = [];
       _ordenManzInt = [];
+      _mensajeManz = [];
       for (var i = 0; i < points.length; i++) {
         var d = points[i]['point'];
         _points.add(LatLng(d[1], d[0]));
@@ -117,6 +122,7 @@ class MapsController extends GetxController {
       for (var i = 0; i < area.length; i++) {
         var d = area[i]['area'];
         _ordenManz.add(area[i]['orden_manz']);
+        _mensajeManz.add(area[i]['mensaje']);
         _puntoManz.add(LatLng(area[i]['punto_medio'][1], area[i]['punto_medio'][0]));
         List<LatLng> latLng = [];
         for (var j = 0; j < d.length; j++) {
@@ -140,6 +146,7 @@ class MapsController extends GetxController {
       _ordenManz = [];
       _puntoManz = [];
       _ordenManzInt = [];
+      _mensajeManz = [];
       for (var i = 0; i < points.length; i++) {
         var d = points[i]['point'];
         _points.add(LatLng(d[1], d[0]));
@@ -154,6 +161,7 @@ class MapsController extends GetxController {
       for (var i = 0; i < area.length; i++) {
         var d = area[i]['area'];
         _ordenManz.add(area[i]['orden_manz']);
+        _mensajeManz.add(area[i]['mensaje']);
         _puntoManz.add(LatLng(area[i]['punto_medio'][1], area[i]['punto_medio'][0]));
         List<LatLng> latLng = [];
         for (var j = 0; j < d.length; j++) {
