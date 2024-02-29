@@ -2,10 +2,12 @@ import 'package:app_recorrido_mapa/dependency/dependency_injection.dart';
 import 'package:app_recorrido_mapa/src/main_app.dart';
 import 'package:app_recorrido_mapa/src/provider/map_controller.dart';
 import 'package:app_recorrido_mapa/src/services/connectivity_service.dart';
+import 'package:app_recorrido_mapa/src/utils/ssl_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:http/http.dart' as http;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();   
@@ -14,6 +16,10 @@ Future<void> main() async {
           //requestNotificationPermission();
     await FlutterMapTileCaching.initialise();
     await FMTC.instance('mapStore').manage.createAsync();
+  
+  http.Client ioClient =
+      SSLUtils.createLEClient('https://valid-isrgrootx1.letsencrypt.org/');  
+
   Get.put(MapsController());
   runApp(const MainApp());
   
