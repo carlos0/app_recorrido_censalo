@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dio_cache_interceptor_hive_store/dio_cache_interceptor_hive_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -7,8 +8,9 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:info_popup/info_popup.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
+import 'package:flutter_map_cache/flutter_map_cache.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../provider/map_controller.dart';
 
@@ -36,6 +38,15 @@ class _MapScreenState extends State<MapScreen> {
   String posicion = "";
   String? damagedDatabaseDeleted;
   bool mostrarManzano = true;
+  String path = '';
+
+  Future<String> getPath() async {
+    final cacheDirectory = await getTemporaryDirectory();
+    setState(() { 
+      path = cacheDirectory.path;
+    });
+    return cacheDirectory.path;
+  }
   
   MapsController mapController = Get.find<MapsController>();
   
@@ -44,7 +55,8 @@ class _MapScreenState extends State<MapScreen> {
   final List<Marker> myMarkers = [];
   List<String> tilesOption = [
     'http://www.google.com/maps/vt?lyrs=s,h&x={x}&y={y}&z={z}',
-    'http://www.google.com/maps/vt?lyrs=m&x={x}&y={y}&z={z}',
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+    //'http://www.google.com/maps/vt?lyrs=m&x={x}&y={y}&z={z}',
     'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
   ];
   String? tileSelect;
@@ -53,6 +65,7 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void initState() {
     super.initState();
+    getPath();
     if (mounted) {
       setState(() {
         tileSelect = box.read('tileSelect') ?? tilesOption[0];
@@ -222,7 +235,13 @@ class _MapScreenState extends State<MapScreen> {
                             subdomains: const ['a', 'b', 'c'],
                             userAgentPackageName:
                                 'dev.fleaflet.flutter_map.example',
-                            tileProvider: FMTC.instance('mapStore').getTileProvider(),
+                            tileProvider: CachedTileProvider(
+                              maxStale: const Duration(days: 5),
+                              store: HiveCacheStore(
+                                path,
+                                hiveBoxName: 'HiveCacheStore',
+                              ),
+                            ),
                           );
                         }),
                         CurrentLocationLayer(

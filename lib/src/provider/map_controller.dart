@@ -1,5 +1,7 @@
 import 'package:app_recorrido_mapa/src/models/polygon.dart';
+import 'package:app_recorrido_mapa/src/screens/home_screen.dart';
 import 'package:app_recorrido_mapa/src/services/connectivity_service.dart';
+import 'package:app_recorrido_mapa/src/utils/alert.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -52,8 +54,7 @@ class MapsController extends GetxController {
   getPolygons(String segmentoId) async {
     bool connectivity = ConnectivityService().isConnected;
     if (connectivity) {
-      HttpResponse response =
-          await HttpClient.instance.get('api/v1/ruta/buscar/$segmentoId');
+      HttpResponse response = await HttpClient.instance.get('api/v1/ruta/buscar/$segmentoId');
       if (response.data != null) {
         var polygons = response.data['rutas'];
         var points = response.data['points'];
@@ -95,6 +96,10 @@ class MapsController extends GetxController {
         box.write('polygons', polygons);
         box.write('areas', area);
         box.write('points', points);
+      } else {
+        //Get.to(() => const HomeScreen());
+       // Navigator.pop(context);
+        Alert.error('No se encontraron datos');
       }
     } else {
       var polygons = box.read('polygons');

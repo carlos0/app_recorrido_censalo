@@ -1,8 +1,11 @@
 import 'package:app_recorrido_mapa/src/screens/qr_screen.dart';
+import 'package:app_recorrido_mapa/src/utils/alert.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:info_popup/info_popup.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -93,14 +96,41 @@ class _HomeScreenState extends State<HomeScreen> {
               //contentTitle: 'Esta es la información del segmento',
               customContent: () {
                 return Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(5),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Column(
+                  child: Column(
                     children: [
-                      Text('El segmento tiene un total de 8 digitos ejemplo "32701125". si en los mapas se muestra menos digitos, se debe agregar ceros a la izquierda para completar los 8 digitos.', style: TextStyle(fontSize: 16, ), textAlign: TextAlign.justify,),
+                      const Text('El segmento tiene un total de 8 digitos ejemplo "32701125". si en los mapas se muestra menos digitos, se debe agregar ceros a la izquierda para completar los 8 digitos.', style: TextStyle(fontSize: 16, ), textAlign: TextAlign.justify,),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      RichText(
+                        text: TextSpan(
+                          children: [
+                            const TextSpan(
+                              text: 'Si necesita ayuda puede consultar con el manual de usuario: ',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black,
+                              )
+                            ),
+                            TextSpan(
+                              text: ' MANUAL DE USUARIO',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.cyan,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                  _launch(Uri.parse('https://nubecpv.ine.gob.bo/index.php/s/GrEEwfTsn2PwstF'));
+                                }
+                            )
+                          ]
+                        )
+                      ),
                     ]
                   )
                 );
@@ -180,10 +210,19 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(
               height: 40,
             ),
-            const Text('Versión 1.0.2', style: TextStyle(fontSize: 13, color: Colors.black54),),
+            const Text('Versión 1.0.3', style: TextStyle(fontSize: 13, color: Colors.black54),),
           ]),
         ),
       ),
     );
+  }
+
+  Future<void> _launch(Uri url) async {
+    if (!await launchUrl(
+      url,
+      mode: LaunchMode.externalApplication,
+    )) {
+      Alert.error('No se pudo ir al enlace');
+    }
   }
 }
