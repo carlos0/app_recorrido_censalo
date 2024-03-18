@@ -181,6 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 RegExp exp = RegExp(r'^\d{8}$');
                 if (exp.hasMatch(_searchController.text)) {
                   box.write('segmento', _searchController.text);
+                  box.write('envio', 1);
                   Navigator.pushNamed(context, 'map', arguments: _searchController.text);
                   _searchController.text = '';
                 } else {

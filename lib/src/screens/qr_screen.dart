@@ -106,6 +106,7 @@ class _QrScreenState extends State<QrScreen> {
         RegExp exp = RegExp(r'^\d{8}$');
         if (exp.hasMatch(verifResult[0])) {
           box.write('segmento', verifResult[0]);
+          box.write('envio', 1);
           Navigator.pushNamed(context, 'map', arguments: verifResult[0])
             .then((value) => {
               controller.resumeCamera(),

@@ -53,7 +53,9 @@ class MapsController extends GetxController {
 
   getPolygons(String segmentoId) async {
     bool connectivity = ConnectivityService().isConnected;
-    if (connectivity) {
+    print(box.read('envio'));
+    if (connectivity && box.read('envio') == 1) {
+      box.write('envio', 2);
       HttpResponse response = await HttpClient.instance.get('api/v1/ruta/buscar/$segmentoId');
       if (response.data != null) {
         var polygons = response.data['rutas'];
